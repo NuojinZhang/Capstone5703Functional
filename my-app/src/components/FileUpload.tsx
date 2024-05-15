@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from "./ui/button"; 
+import { Button } from "./ui/button";
 
 const FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);

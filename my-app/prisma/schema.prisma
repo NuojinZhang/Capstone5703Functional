@@ -11,6 +11,6 @@ generator client {
 model File {
   id        Int      @id @default(autoincrement())
   filename  String
-  filepath  String   @db.Bytea
+  filepath  String
   createdAt DateTime @default(now())
 }

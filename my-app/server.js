@@ -1,10 +1,7 @@
-// server.js
 const express = require('express');
 const next = require('next');
 const multer = require('multer');
-const path = require('path');
 const { PrismaClient } = require('@prisma/client');
-const sanitize = require('sanitize-filename'); 
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -16,7 +13,6 @@ const upload = multer({ dest: 'public/uploads/' });
 app.prepare().then(() => {
   const server = express();
 
-  // 中间件用于解析 JSON 请求体
   server.use(express.json());
   server.use(express.urlencoded({ extended: true }));
 
@@ -28,27 +24,28 @@ app.prepare().then(() => {
       return res.status(400).json({ success: false, error: 'No file uploaded' });
     }
 
-    // 解码并清理文件名
-    const originalName = decodeURIComponent(file.originalname);
-    const sanitizedFilename = sanitize(originalName);
+    try {
+      console.log('Saving file to database:', {
+        filename: file.originalname,
+        filepath: `/uploads/${file.filename}`,
+      });
 
-    const newFilePath = path.join('public/uploads/', sanitizedFilename);
+      // 保存文件信息到数据库
+      const savedFile = await prisma.file.create({
+        data: {
+          filename: file.originalname,
+          filepath: `/uploads/${file.filename}`,
+        },
+      });
 
-    require('fs').renameSync(file.path, newFilePath);
-
-    // 保存文件信息到数据库
-    const savedFile = await prisma.file.create({
-      data: {
-        filename: sanitizedFilename,
-        filepath: `/uploads/${sanitizedFilename}`,
-      },
-    });
-
-    res.status(200).json({ success: true, file: savedFile });
+      res.status(200).json({ success: true, file: savedFile });
+    } catch (error) {
+      console.error('Error saving file to database:', error);
+      res.status(500).json({ success: false, error: 'Error saving file to database' });
+    }
   });
 
-  // 处理所有其他请求并交给 Next.js
-  server.get('*', (req, res) => {
+  server.all('*', (req, res) => {
     return handle(req, res);
   });
 
