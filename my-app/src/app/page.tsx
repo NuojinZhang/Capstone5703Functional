@@ -3,6 +3,7 @@
 
 import React from 'react';
 import FileUpload from '../components/FileUpload';
+import "./globals.css";
 
 const Home: React.FC = () => {
   return (
