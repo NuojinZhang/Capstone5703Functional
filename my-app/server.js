@@ -1,14 +1,39 @@
+// server.js
+
 const express = require('express');
 const next = require('next');
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 const { PrismaClient } = require('@prisma/client');
+const algoliasearch = require('algoliasearch');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const prisma = new PrismaClient();
-const upload = multer({ dest: 'public/uploads/' });
+
+const uploadDir = path.join(__dirname, 'public/uploads');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
+const client = algoliasearch('ANLFWNG46P', 'ca5cdb3cc6a354943a3deaae7d9e1b1b');
+const index = client.initIndex('5703_FUNCTIONAL');
 
 app.prepare().then(() => {
   const server = express();
@@ -16,7 +41,6 @@ app.prepare().then(() => {
   server.use(express.json());
   server.use(express.urlencoded({ extended: true }));
 
-  // 文件上传路由
   server.post('/api/upload', upload.single('file'), async (req, res) => {
     console.log('File upload handled by Express.js');
     const { file } = req;
@@ -25,18 +49,15 @@ app.prepare().then(() => {
     }
 
     try {
-      console.log('Saving file to database:', {
-        filename: file.originalname,
-        filepath: `/uploads/${file.filename}`,
-      });
-
-      // 保存文件信息到数据库
       const savedFile = await prisma.file.create({
         data: {
           filename: file.originalname,
           filepath: `/uploads/${file.filename}`,
         },
       });
+
+      const record = { objectID: savedFile.id, filename: file.originalname, filepath: `/uploads/${file.filename}`, createdAt: new Date().toISOString() };
+      await index.saveObject(record).wait();
 
       res.status(200).json({ success: true, file: savedFile });
     } catch (error) {

@@ -9,9 +9,7 @@ import "./globals.css";
 const Home: React.FC = () => {
   return (
     <div>
-      <h1>File Upload</h1>
       <FileUpload />
-      <h2>Search Files</h2>
       <Search />
     </div>
   );

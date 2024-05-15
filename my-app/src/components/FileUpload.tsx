@@ -57,7 +57,7 @@ const FileUpload: React.FC = () => {
           id="file-upload"
           onChange={handleFileChange}
           className="file-upload-input"
-          style={{ display: 'none' }} // Hide the default input
+          style={{ display: 'none' }} 
         />
         <div className="file-upload-control">
           <Button asChild variant="outline" size="default" onClick={() => document.getElementById('file-upload')!.click()}>
