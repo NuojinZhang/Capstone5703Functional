@@ -76,7 +76,7 @@ export function BasicSearch() {
         toast({
             title: "You are searching the following values:",
             description: (
-                <div className="mt-2 w-[340px] rounded-md bg-slate-950 p-4 text-black">
+                <div className="mt-2 w-[340px] rounded-md bg-slate-950 p-4 text-white">
                     Searching for: {data.searchValue}
                 </div>
             ),
