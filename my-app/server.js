@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const client = algoliasearch('ANLFWNG46P', 'ca5cdb3cc6a354943a3deaae7d9e1b1b');
-const index = client.initIndex('5703_FUNCTIONAL');
+const index = client.initIndex('Upload_Search_Functional_Module');
 
 app.prepare().then(() => {
   const server = express();

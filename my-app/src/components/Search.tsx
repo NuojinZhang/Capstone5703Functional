@@ -11,7 +11,6 @@ import { Button } from "./ui/button";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -120,7 +119,7 @@ export function BasicSearch() {
             </Form>
 
             {query && (
-                <InstantSearch searchClient={searchClient} indexName="5703_FUNCTIONAL">
+                <InstantSearch searchClient={searchClient} indexName="Upload_Search_Functional_Module">
                     <ConnectedSearchBox defaultRefinement={query} />
                     <Hits hitComponent={Hit} />
                 </InstantSearch>
