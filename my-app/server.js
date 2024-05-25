@@ -23,8 +23,7 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    cb(null, file.originalname); 
   }
 });
 
@@ -50,11 +49,11 @@ app.prepare().then(() => {
       const savedFile = await prisma.file.create({
         data: {
           filename: file.originalname,
-          filepath: `/uploads/${file.filename}`,
+          filepath: `/uploads/${file.originalname}`,
         },
       });
 
-      const record = { objectID: savedFile.id, filename: file.originalname, filepath: `/uploads/${file.filename}`, createdAt: new Date().toISOString() };
+      const record = { objectID: savedFile.id, filename: file.originalname, filepath: `/uploads/${file.originalname}`, createdAt: new Date().toISOString() };
       await index.saveObject(record).wait();
 
       res.status(200).json({ success: true, file: savedFile });

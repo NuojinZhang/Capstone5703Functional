@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { Button } from "./ui/button";
+import { useToast } from "./ui/use-toast";
+import { Toaster } from "./ui/toaster";
 
 const FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [message, setMessage] = useState<string>('');
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string>("");
+  const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
@@ -31,11 +32,24 @@ const FileUpload: React.FC = () => {
       if (!res.ok) throw new Error(await res.text());
 
       const result = await res.json();
-      setFileUrl(result.file.filepath);
-      setMessage('File uploaded successfully.');
+      setFile(null);
+      setSelectedFile('');
+
+      toast({
+        title: "File Uploaded Successfully",
+        description: (
+          <div className="mt-2 w-[340px] rounded-md bg-slate-950 p-4 text-white">
+            File Name: {file.name}<br />
+            Uploaded at: {new Date().toLocaleString()}
+          </div>
+        ),
+      });
     } catch (e) {
       console.error(e);
-      setMessage('Error uploading file.');
+      toast({
+        title: "Error",
+        description: "Error uploading file.",
+      });
     }
   };
 
@@ -51,6 +65,8 @@ const FileUpload: React.FC = () => {
         textAlign: 'center',
       }}
     >
+      <Toaster />
+
       <div className="file-upload-content">
         <input
           type="file"
@@ -72,12 +88,6 @@ const FileUpload: React.FC = () => {
             <Button type="submit" variant="default">Upload File</Button>
           </form>
         </div>
-      )}
-      {message && <p>{message}</p>}
-      {fileUrl && (
-        <p>
-          File uploaded to: <a href={fileUrl} target="_blank" rel="noopener noreferrer">{fileUrl}</a>
-        </p>
       )}
     </div>
   );
