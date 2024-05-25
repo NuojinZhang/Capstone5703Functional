@@ -40,7 +40,8 @@ const FileUpload: React.FC = () => {
         description: (
           <div className="mt-2 w-[340px] rounded-md bg-slate-950 p-4 text-white">
             File Name: {file.name}<br />
-            Uploaded at: {new Date().toLocaleString()}
+            Uploaded at: {new Date().toLocaleString()}<br />
+            Filepath: {result.file.filepath}
           </div>
         ),
       });
